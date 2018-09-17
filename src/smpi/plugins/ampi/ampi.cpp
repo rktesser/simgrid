@@ -22,6 +22,28 @@ extern "C" void* _sampi_malloc(size_t size)
   return result;
 }
 
+extern "C" void* _sampi_calloc(size_t n_elm, size_t elm_size)
+{
+  void* result = calloc (n_elm, elm_size); // We need the space here to prevent recursive substitution
+  alloc_table.insert({result, n_elm * elm_size});
+  if (not simgrid::s4u::this_actor::is_maestro()) {
+    memory_size[simgrid::s4u::this_actor::get_pid()] += n_elm * elm_size;
+  }
+  return result;
+}
+
+extern "C" void* _sampi_realloc(void *ptr, size_t size)
+{
+  void* result = realloc (ptr, size); // We need the space here to prevent recursive substitution
+  int old_size = alloc_table.at(ptr);
+  alloc_table.erase(ptr);
+  alloc_table.insert({result, size});
+  if (not simgrid::s4u::this_actor::is_maestro()) {
+    memory_size[simgrid::s4u::this_actor::get_pid()] += size - old_size;
+  }
+  return result;
+}
+
 extern "C" void _sampi_free(void* ptr)
 {
   size_t alloc_size = alloc_table.at(ptr);

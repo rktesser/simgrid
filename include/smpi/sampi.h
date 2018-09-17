@@ -15,6 +15,8 @@
 
 #ifndef HAVE_SMPI
 #define malloc(nbytes) _sampi_malloc(nbytes)
+#define calloc(n_elm,elm_size) _sampi_calloc(n_elm,elm_size)
+#define realloc(ptr,nbytes) _sampi_realloc(ptr,nbytes)
 #define free(ptr) _sampi_free(ptr)
 #endif
 
@@ -22,6 +24,8 @@ SG_BEGIN_DECL()
 
 XBT_PUBLIC void* _sampi_malloc(size_t size);
 XBT_PUBLIC void _sampi_free(void* ptr);
+XBT_PUBLIC void* _sampi_calloc(size_t n_elm, size_t elm_size);
+XBT_PUBLIC void* _sampi_realloc(void *ptr, size_t size);
 
 AMPI_CALL(XBT_PUBLIC int, MPI_Iteration_in, (MPI_Comm comm))
 AMPI_CALL(XBT_PUBLIC int, MPI_Iteration_out, (MPI_Comm comm))
